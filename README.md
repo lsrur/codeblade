@@ -1,10 +1,16 @@
-# Very short description of the package
+# Code Generator for Laravel
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/lsrur/codeblade.svg?style=flat-square)](https://packagist.org/packages/lsrur/codeblade)
 [![Total Downloads](https://img.shields.io/packagist/dt/lsrur/codeblade.svg?style=flat-square)](https://packagist.org/packages/lsrur/codeblade)
-![GitHub Actions](https://github.com/lsrur/codeblade/actions/workflows/main.yml/badge.svg)
 
-This is where your description should go. Try and limit it to a paragraph or two, and maybe throw in a mention of what PSRs you support to avoid any confusion with users and contributors.
+
+Codeblade does not require you to write definition files, instead it reverse-engineers your database and exposes a data dictionary to your code generation templates. You write these templates in pure Blade! Yes, Blade generating Laravel code such as models, controllers, views, form requests, but also Vue, React or Livewire components or whatever you need, just write the template you need with the Blade syntax you already know.
+
+
+## Requirements
+
+- Laravel 9.x (Codeblade uses a new feature in Laravel 9 for inline compilation of Blade templates, it won't work with earlier versions). 
+- MySQL (For now, Codeblade works only with MySQL/MariaDB connections. Reverse engineer tools for PgSQL will be available soon).
 
 ## Installation
 
@@ -14,21 +20,37 @@ You can install the package via composer:
 composer require lsrur/codeblade
 ```
 
-## Usage
-
-```php
-// Usage description here
-```
-
-### Testing
+Publish the configuration file:
 
 ```bash
-composer test
+composer require lsrur/codeblade
 ```
 
-### Changelog
+Prepare the template folder in your project and copy sample templates:
 
-Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
+```bash
+php artisan codeblade:install
+```
+
+
+## Configuration
+Once
+
+## Usage
+### Code generation command
+```bash
+php artisan codeblade:make <template> <table1,table2> --force --copy
+```
+```bash
+<template> : the template file 
+<tables> : one or multiple table names to be parsed and passed to the generator
+--copy : copy output code to clipboard instead of writing files
+--force  : will overwrite output files without asking
+```
+
+### Writing templates
+
+
 
 ## Contributing
 
@@ -38,15 +60,9 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 If you discover any security related issues, please email lautarosrur@gmail.com instead of using the issue tracker.
 
-## Credits
-
--   [Lautaro Srur](https://github.com/lsrur)
--   [All Contributors](../../contributors)
 
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
 
-## Laravel Package Boilerplate
 
-This package was generated using the [Laravel Package Boilerplate](https://laravelpackageboilerplate.com).
