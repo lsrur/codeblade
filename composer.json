@@ -1,0 +1,50 @@
+{
+  "name": "lsrur/codeblade",
+  "description": "Laravel Code Generation Tool",
+  "keywords": [
+    "lsrur",
+    "codeblade"
+  ],
+  "homepage": "https://github.com/lsrur/codeblade",
+  "license": "MIT",
+  "type": "library",
+  "authors": [{
+    "name": "Lautaro Srur",
+    "email": "lautarosrur@gmail.com",
+    "role": "Developer"
+  }],
+  "require": {
+    "php": "^8.0",
+    "illuminate/support": "^9.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Lsrur\\Codeblade\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Lsrur\\Codeblade\\Tests\\": "tests"
+    }
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit",
+    "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Lsrur\\Codeblade\\CodebladeServiceProvider"
+      ],
+      "aliases": {
+        "Codeblade": "Lsrur\\Codeblade\\CodebladeFacade"
+      }
+    }
+  }
+}
