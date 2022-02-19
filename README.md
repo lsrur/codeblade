@@ -2,7 +2,7 @@
 
 # A handy and powerful code generator for Laravel
 
-As programmers we always find ourselves with the tedious need to write repetitive code for different models or tables of our application. As a code generator, Codeblade will free you from that boredom and will bring you two great features over other similar tools. 
+As programmers we always face the tedious need to write repetitive code for different models or tables of our application. As a code generator, Codeblade will free you from that boredom and will bring you two great features over other similar tools. 
 
 - Codeblade does not require you to write and maintain definition files (json, yaml or any other metadata file), instead it reverse-engineers your database on the fly and exposes a data dictionary to your templates for code generation. Handy.
 
@@ -43,10 +43,10 @@ You can install the package via composer:
 composer require lsrur/codeblade
 ```
 
-Publish the configuration file:
+Publish the configuration file (it will be useful):
 
 ```bash
-php artisan vendor publish
+php artisan vendor:publish --provider="Lsrur\Codeblade\CodebladeServiceProvider"
 ```
 
 Prepare the templates folder in your project and copy the examples:
@@ -94,7 +94,7 @@ Those parameters will be usable from the template as follows:
 @endif
 
 @if(! $params->noexist)
-  noexist is OFF
+  noexist is OFF or does not exists
 @endif
 
 {{$params->foo}}
@@ -116,7 +116,7 @@ Every time you execute a "make" command, Codeblade reverse-engineers the tables 
 
 | Property| Description|
 |-----|----|
-|name     |Name of the table |
+|name     |Name of the table as Stringable instance [(see stringables)](#stringables) |
 |singular|The name of the table in the singular|
 |modelName|Inferred model name based on Laravel naming conventions (contacts > Contact)|
 |fields| Array of Field objects |
@@ -126,16 +126,13 @@ Every time you execute a "make" command, Codeblade reverse-engineers the tables 
 
 | Property | Description |
 |-----|----|
-|name|Name of the field|
-|label|Inferred label based on field's name (company_name -> Company Name)|
-|camel|Name in camelCase|
-|studly |Name in StudlyCase|
+|name|Name of the field as Stringable instance [(see stringables)](#stringables)|
 |primary|The field is primary key (boolean)  |
 |autoincrement|The field is autoincrement (boolean)|
 |index| The field has an index (boolean)|
 |default|Default value (any)|
 |nullable|Field is nullable (boolean)|
-|base_type|The base or type (see table below)|
+|base_type|The base type [(see base types)](#base_types)|
 |type| Field type |
 |size| Field size or total digits |
 |scale|Decimal digits|
@@ -147,7 +144,17 @@ Every time you execute a "make" command, Codeblade reverse-engineers the tables 
 |cast|Cast type (Ex: json->array)|
 |custom_property| See custom properties below| 
 
-#### Base types
+
+#### <a name="base_types"></a>Base types
+base types are useful for grouping similar data types together and then using those groups in your templates instead of type by type:
+
+```
+@foreach($Table->fields as $field)
+	@includeIf($field->base_type == 'string', 'partials.forms.textinput');
+	@includeIf($field->base_type == 'integer', 'partials.forms.integerinput');
+@endforeach
+```
+
 
 | MySQL Field type |Base type |
 |-----|----|
@@ -172,8 +179,9 @@ Codeblade will parse the "comment" metadata of each field looking for custom pro
 Schema::create('contacts', function (Blueprint $table) {
   $table->string("company_name")
      ->comment("faker=company(),flag,foo=bar");
-
+...
 ```
+
 Then those properties will be available in your templates as direct properties of each field.
 
 ```
@@ -181,8 +189,12 @@ Then those properties will be available in your templates as direct properties o
   @if($field->flag)
     // 'flag' will be true for company_name
   @endif
+  
+  @if($field->foo == 'bar')
+    // 
+  @endif
 
-  {{$field->var}} = faker()->{{$field->faker}};
+  ${{$field->name->camel()}} = faker()->{{$field->faker}};
   // result: $companyName = faker()->company();
   
 @endforeach
@@ -200,6 +212,23 @@ Then those properties will be available in your templates as direct properties o
 |foreign_key | Related foreign key| 
 |foreign_table | Related foreign table| 
 
+
+#### <a name="stringables"></a>Stringables
+The "name" property of Table and Field classes are returned as Stringable instances, so you can use them as-is or chain \Str methods:
+
+```
+{{$Table->name}}
+// contacts
+
+{{$Table->name->singular()->title()->append('Controller'}}
+// ContactController
+
+@foreach($Table->fields as $field)
+  {{$field->name->camel()->prepend('$')}} = $request->{{$field->name}};
+  // ... $companyName = $request->company_name;
+@endforeach
+
+```
 
 ### <a name="directives"></a>Blade Directives
 

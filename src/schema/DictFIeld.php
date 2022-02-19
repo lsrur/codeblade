@@ -11,22 +11,9 @@ class DictField
     $this->attributes = $attributes;
   }
 
-  public function getLabel()
+  public function getName()
   {
-    return \Str::of($this->name)
-        ->replace('_', ' ')
-        ->title()
-        ->value();
-  }
-
-  public function getCamel()
-  {
-    return  \Str::camel($this->name);
-  }
-
-  public function getStudlyl()
-  {
-    return  \Str::studly($this->name);
+    return \Str::of($this->attributes['name']);
   }
 
   public function getCast()
