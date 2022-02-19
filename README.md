@@ -65,7 +65,7 @@ There are two configuration keys in config/codeblade.php:
 
 ## <a name="codegen"></a>Code generation
 
-```bash
+```
 php artisan codeblade:make <template> <table1,table2> --force --copy
 ```
 
@@ -82,7 +82,7 @@ php artisan codeblade:make <template> <table1,table2> --force --copy
 ## <a name="writing"></a>Writing templates
 Every time you execute a "make" command, Codeblade reverse-engineers the tables involved, creating a data dictionary which passes to the code generation template in the form of an object with the following properties:
 
-###<a name="table_object"></a>Table Class
+### <a name="table_object"></a>Table Class
 
 
 | Property| Description|
@@ -93,13 +93,13 @@ Every time you execute a "make" command, Codeblade reverse-engineers the tables 
 |fields| Array of fields |
 |relations| Array of relations  |
 
-###<a name="field_object"></a>Field Class
+### <a name="field_object"></a> Field Class
 
 | Property | Description |
 |-----|----|
-|name     |Name of the field|
-|label    |Inferred label based on field's name (company_name -> Company Name)|
-|var|Inferred var name (company_name -> $companyName)|
+|name|Name of the field|
+|label|Inferred label based on field's name (company_name -> Company Name)|
+|var|Inferred var name (company_name -> &#36;companyName)|
 |primary|The field is primary key (boolean)  |
 |autoincrement|The field is autoincrement (boolean)|
 |index| The field has an index (boolean)|
@@ -159,7 +159,7 @@ Then those properties will be available in your templates as direct properties o
 
 ```
 
-###<a name="field_object"></a>Relation Class
+### <a name="field_object"></a>Relation Class
 
 |Property |Description |
 |-----|----|
@@ -171,7 +171,7 @@ Then those properties will be available in your templates as direct properties o
 |foreign_table | Related foreign table| 
 
 
-###<a name="directives"></a>Blade Directives
+### <a name="directives"></a>Blade Directives
 
 ##### @cbSaveAs() 
 Tells Codeblade where to write the generated code. Every template must have a `@cbSaveAs` directive unless it will always be used with the --copy option (copy to the clipboard) or always called as part of another template with `@include`. 
@@ -197,7 +197,7 @@ Tells Codeblade to execute another template.
 
 ```
 
-###<a name="samples"></a>Example Templates
+### <a name="samples"></a>Example Templates
 #### Basic
 
 ```
