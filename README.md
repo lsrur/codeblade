@@ -3,22 +3,26 @@
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/lsrur/codeblade.svg?style=flat-square)](https://packagist.org/packages/lsrur/codeblade)
 [![Total Downloads](https://img.shields.io/packagist/dt/lsrur/codeblade.svg?style=flat-square)](https://packagist.org/packages/lsrur/codeblade)
 
-As programmers we always find ourselves with the tedious need to write repetitive code for different models or tables of our application. As a code generator, Codeblade will help us in this process but with two big differences compared to other tools:
+As programmers we always find ourselves with the tedious need to write repetitive code for different models or tables of our application. As a code generator, Codeblade will free you from that boredom and will bring you two great features over other tools.
 
 - Codeblade does not require you to write or maintain definition files (json, yaml or other metadata file), instead it reverse-engineers your database on the fly and exposes a data dictionary to your templates for code generation. 
 
-- You write your own templates in pure Blade! Yes, Laravel Blade generating Laravel code such as models, controllers, views, form requests, but also Vue, React, Livewire components or any source code you need, just write the template with the Blade syntax you already know.
+- You write your own templates in pure Blade! Yes, Laravel Blade generating Laravel code such as models, controllers, views, seeders, form requests... but also Vue, React, Livewire or any source code you need, just write the template with the Blade syntax you already know.
 
 ## Table of Contents
 1. [Requirements](#requirements)
 2. [Instalation](#instalation)
-3. [Configuration](#requirements)
-4. [Code generation](#requirements)
-5. [Writing templates](#requirements)
-	1. [Sub paragraph](#subparagraph1)
-6. [Contributing](#requirements)
-7. [Security](#requirements)
-7. [License](#requirements)
+3. [Configuration](#config)
+4. [Code generation](#codegen)
+5. [Writing templates](#writing)
+	1. [Table Class](#table_object)
+	2. [Field Class](#field_object)
+	3. [Relation Class](#relation_object)
+	4. [Directives](#directives)
+	5. [Examples](#samples)
+6. [Contributing](#contrib)
+7. [Security](#security)
+7. [License](#license)
 
 
 
@@ -51,29 +55,37 @@ php artisan codeblade:install
 ```
 
 
-## Configuration
-Once
+## <a name="config"></a>Configuration
+There are two configuration keys in config/codeblade.php:
 
+| Key|Description |
+|-----|----|
+|template_folders|Array of folders where to look for the templates. You can include a shared template folder located outside your project.|
+|pbcopy_command|Shell command for copying file contents to the clipboard (as pbcopy is for linux/osx)|
 
-## Code generation
-
+## <a name="codegen"></a>Code generation
 
 ```bash
 php artisan codeblade:make <template> <table1,table2> --force --copy
 ```
-```bash
-<template> : template file 
-<tables> : one or multiple table names to be parsed and passed to the generator
---copy : copy output code to the clipboard instead of writing files
---params: parameters to be passed to the template
---force  : overwrite output files without asking
-```
 
-## Writing templates
+| Param|Description |
+|-----|----|
+|template|Template file in dot notation (samples.controller), it should exist in one of your template folders defined in the configuration file |
+| table1,table2 | One or multiple table names (separated by commas) to be parsed and passed to the generator |
+|--copy| Copy output code to the clipboard instead of writing files|
+|--force|Oerwrite output files without asking|
+
+
+
+
+## <a name="writing"></a>Writing templates
 Every time you execute a "make" command, Codeblade reverse-engineers the tables involved, creating a data dictionary which passes to the code generation template in the form of an object with the following properties:
 
+###<a name="table_object"></a>Table Class
 
-| Table | |
+
+| Property| Description|
 |-----|----|
 |name     |Name of the table |
 |singular|The name of the table in the singular|
@@ -81,17 +93,19 @@ Every time you execute a "make" command, Codeblade reverse-engineers the tables 
 |fields| Array of fields |
 |relations| Array of relations  |
 
-| Field | |
+###<a name="field_object"></a>Field Class
+
+| Property | Description |
 |-----|----|
-|name     |Name of the field (string)|
+|name     |Name of the field|
 |label    |Inferred label based on field's name (company_name -> Company Name)|
 |var|Inferred var name (company_name -> $companyName)|
 |primary|The field is primary key (boolean)  |
 |autoincrement|The field is autoincrement (boolean)|
-|index| The field has index (boolean)|
+|index| The field has an index (boolean)|
 |default|Default value (any)|
 |nullable|Field is nullable (boolean)|
-|base_type|The base or type (ex: char and varchar has base_type=string)|
+|base_type|The base or type (see table below)|
 |type| Field type |
 |size| Field size or total digits |
 |scale|Decimal digits|
@@ -103,20 +117,88 @@ Every time you execute a "make" command, Codeblade reverse-engineers the tables 
 |cast|Cast type (Ex: json->array)|
 |custom_property| See custom properties below| 
 
+#### Base types
 
-| Relation |Description |
+| MySQL Field type |Base type |
 |-----|----|
+|char, varchar|string| 
+|text, longtext, tinytext, mediumtext|text| 
+|int, smallint, mediumint, bigint|integer| 
+|tinyint|boolean|
+|float, decimal, double|decimal|
+|date|date|
+|datetime, timestamp|datetime|
+|blob, binary, longblob, mediumblob, tinyblob, varbinary|binary|
+|enum | enum|
+|set | set|
+|json, jsonb | json|
 
-#### Codeblade Blade directives 
+ 
+#### Custom properties 
+Codeblade will parse the "comment" metadata of each field looking for custom properties. You can add these properties in the field definition during migration in the following way:
+
+```
+...
+Schema::create('contacts', function (Blueprint $table) {
+  $table->string("company_name")
+     ->comment("faker=company(),encrypt,foo=bar");
+
+```
+Then those properties will be available in your templates as direct properties of each field.
+
+```
+@foreach($tabe->fields as $field)
+  @if($field->encrypt)
+    // 'encrypt' will be true for company_name
+  @endif
+
+  {{$field->var}} = faker()->{{$field->faker}};
+  // result: $companyName = faker()->company();
+  
+@endforeach
+
+```
+
+###<a name="field_object"></a>Relation Class
+
+|Property |Description |
+|-----|----|
+|local_key| |
+|type|'belongs_to_many' or 'has_many' |
+|pivot|Pivot table name for 'belongs_to_many'|
+|model|Related model name based on Laravel naming conventions |
+|foreign_key | Related foreign key| 
+|foreign_table | Related foreign table| 
 
 
-##### @cbSaveAs
-This directive tells  
+###<a name="directives"></a>Blade Directives
+
+##### @cbSaveAs() 
+Tells Codeblade where to write the generated code. Every template must have a `@cbSaveAs` directive unless it will always be used with the --copy option (copy to the clipboard) or always called as part of another template with `@include`. 
+It doesn't matter if you use slashes or backslashes, Codeblade will adjust the output to your OS.
 
 
+```
+@cbSaveAs(app_path('Http/Controllers/'.$table->modelName.'Controller.php'))
+// for table "contacts", the file will be written in app/Http/Controllers/ContactControllar.php
 
+```
 
-#### Basic template example
+##### @cbRun() 
+Tells Codeblade to execute another template.
+
+```
+{{-- This is a CRUD template --}}
+@cbRun('model')
+@cbRun('controller')
+@cbRun('edit_view')
+@cbRun('create_view')
+@cbRun('index_view')
+
+```
+
+###<a name="samples"></a>Example Templates
+#### Basic
 
 ```
 namespace App\Http\Controllers;
@@ -153,32 +235,17 @@ php artisan codeblade:make mytemplate mytable --params=api,css=tailwind
 ...
 ```
 
-#### cbsaveAs
-```
-php artisan codeblade:make mytemplate mytable --params=api,css=tailwind
-```
 
-```
-@if($api'])
-	doThis()
-@endif
-
-@if($parms['css'] == 'tailwind')
-@endif
-
-...
-```
-
-## Contributing
+## <a name="contrib"></a>Contributing
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
-### Security
+## <a name="security"></a>Security
 
 If you discover any security related issues, please email lautarosrur@gmail.com instead of using the issue tracker.
 
 
-## License
+## <a name="license"></a>License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
 
