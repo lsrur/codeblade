@@ -7,16 +7,30 @@ As programmers we always find ourselves with the tedious need to write repetitiv
 
 - Codeblade does not require you to write or maintain definition files (json, yaml or other metadata file), instead it reverse-engineers your database on the fly and exposes a data dictionary to your templates for code generation. 
 
-- You write your own templates in pure Blade! Yes, Laravel Blade generating Laravel code such as models, controllers, views, form requests, but also Vue, React or Livewire components or any source code you need, just write the template with the Blade syntax you already know.
+- You write your own templates in pure Blade! Yes, Laravel Blade generating Laravel code such as models, controllers, views, form requests, but also Vue, React, Livewire components or any source code you need, just write the template with the Blade syntax you already know.
+
+## Table of Contents
+1. [Requirements](#requirements)
+2. [Instalation](#instalation)
+3. [Configuration](#requirements)
+4. [Code generation](#requirements)
+5. [Writing templates](#requirements)
+	1. [Sub paragraph](#subparagraph1)
+6. [Contributing](#requirements)
+7. [Security](#requirements)
+7. [License](#requirements)
 
 
-## Requirements
+
+
+
+## <a name="requirements"></a>Requirements 
 
 - Laravel 9.x (Codeblade uses a new feature in Laravel 9 for inline compilation of Blade templates, it won't work with earlier versions). 
 
 - MySQL (For now, Codeblade only works with MySQL/MariaDB connections. Reverse engineering for pgsql is on the way).
 
-## Installation
+## <a name="instalation"></a>Installation
 
 You can install the package via composer:
 
@@ -30,7 +44,7 @@ Publish the configuration file:
 composer require lsrur/codeblade
 ```
 
-Prepare the templates folder in your project and copy the example ones:
+Prepare the templates folder in your project and copy the examples:
 
 ```bash
 php artisan codeblade:install
@@ -40,8 +54,10 @@ php artisan codeblade:install
 ## Configuration
 Once
 
-## Usage
-### Code generation command
+
+## Code generation
+
+
 ```bash
 php artisan codeblade:make <template> <table1,table2> --force --copy
 ```
@@ -53,7 +69,7 @@ php artisan codeblade:make <template> <table1,table2> --force --copy
 --force  : overwrite output files without asking
 ```
 
-### Writing templates
+## Writing templates
 Every time you execute a "make" command, Codeblade reverse-engineers the tables involved, creating a data dictionary which passes to the code generation template in the form of an object with the following properties:
 
 
