@@ -15,14 +15,6 @@ class CodebladeServiceProvider extends ServiceProvider
    */
   public function boot()
   {
-    /*
-     * Optional methods to load your package assets
-     */
-    // $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'codeblade');
-    // $this->loadViewsFrom(__DIR__.'/../resources/views', 'codeblade');
-    // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-    // $this->loadRoutesFrom(__DIR__.'/routes.php');
-
     Blade::directive('cbSaveAs', function ($expression) {
       $expression = \Str::of($expression)
         ->replace('/', DIRECTORY_SEPARATOR)
@@ -88,8 +80,8 @@ class CodebladeServiceProvider extends ServiceProvider
     $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'codeblade');
 
     // Register the main class to use with the facade
-    $this->app->singleton('codeblade', function () {
-      return new Codeblade;
-    });
+    // $this->app->singleton('codeblade', function () {
+    //   return new Codeblade;
+    // });
   }
 }

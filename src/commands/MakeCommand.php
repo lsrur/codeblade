@@ -18,19 +18,8 @@ class MakeCommand extends Command
 
   protected $description = 'Generate code through templates';
 
-  private $params;
-
   private $toClipboard;
-
-  /**
-   * Create a new command instance.
-   *
-   * @return void
-   */
-  public function __construct()
-  {
-    parent::__construct();
-  }
+  private $params;
 
   /**
    * Find & retrieve template content
@@ -46,7 +35,7 @@ class MakeCommand extends Command
 
     // Search for the file among the template folders
     $templateFile = '';
-    foreach (config('codeblade.template_folders') as $folder) {
+    foreach (\Config::get('codeblade.template_folders', []) as $folder) {
       if (file_exists($folder . DIRECTORY_SEPARATOR . $template)) {
         $templateFile = $folder . DIRECTORY_SEPARATOR . $template;
         break;
@@ -67,15 +56,16 @@ class MakeCommand extends Command
    */
   private function parseParams()
   {
-    $this->params = $this->option('params')
-      ? collect(explode(',', $this->option('params')))
-        ->mapWithKeys(function ($v) {
-          return [
-            \Str::before($v, '=') => (\Str::contains($v, '=') ? \Str::after($v, '=') : true)
-          ];
-        })
-        ->toArray()
-      : [];
+    // \Config::set(
+    //   'cb_params',
+    //   collect(explode(',', $this->option('params') ?? ''))
+    //     ->mapWithKeys(function ($v) {
+    //       return [
+    //         \Str::before($v, '=') => (\Str::contains($v, '=') ? \Str::after($v, '=') : true)
+    //       ];
+    //     })
+    //     ->toArray()
+    // );
   }
 
   /**
@@ -91,10 +81,10 @@ class MakeCommand extends Command
     $cmd = \Str::replace(
       '{file}',
       $fileName,
-      config('codeblade.cbcopy_command', 'pbcopy < {file}')
+      config('codeblade.pbcopy_command', 'pbcopy < {file}')
     );
 
-    // Copy to clipboard
+    // Exec command and get termination
     $res = null;
     $out = [];
     exec($cmd, $out, $res);
@@ -130,7 +120,7 @@ class MakeCommand extends Command
       mkdir($pathInfo['dirname'], 0777, true);
     }
 
-    // If output filename has php ext. add <?php header
+    // If output filename ext is php but not blade.php add <?php header
     if (($pathInfo['extension'] ?? '') == 'php' && !\Str::endsWith($pathInfo['basename'], 'blade.php')) {
       $content = '<?php' . PHP_EOL . PHP_EOL . $content;
     }
@@ -148,22 +138,18 @@ class MakeCommand extends Command
     // Get template content
     $blade = $this->openTemplate($template);
 
-    // cb_save_as must be specified in template with @saveAs
     \Config::set('cb_save_as', null);
-
-    // cb_run indicates
     \Config::set('cb_run', []);
 
-    // Get table's data dictionary
+    // Get table data dictionary
     $tableDict = new DictTable($table);
-
     // Let's code!
     $result = Blade::render($blade, [
       'table' => $tableDict,
       'params' => $this->params
     ], true);
 
-    // Result could be empty for example when a template only calls other templates
+    // Result could be empty, ex when a template only calls other templates
     if (!empty('result')) {
       if ($this->option('copy')) {
         $this->toClipboard .= $result . PHP_EOL;
@@ -183,7 +169,8 @@ class MakeCommand extends Command
   */
   public function handle()
   {
-    $this->parseParams();
+    // $this->parseParams();
+    $this->params = new MakeParams($this->option('params'));
     $this->toClipboard = '';
 
     // Set blade views path to codeblade template paths

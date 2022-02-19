@@ -11,6 +11,24 @@ class DictField
     $this->attributes = $attributes;
   }
 
+  public function getLabel()
+  {
+    return \Str::of($this->name)
+        ->replace('_', ' ')
+        ->title()
+        ->value();
+  }
+
+  public function getCamel()
+  {
+    return  \Str::camel($this->name);
+  }
+
+  public function getStudlyl()
+  {
+    return  \Str::studly($this->name);
+  }
+
   public function getCast()
   {
     $baseTypeCast = [
@@ -46,16 +64,11 @@ class DictField
     ]);
   }
 
-  public function getDefault()
-  {
-    return 'null';
-  }
-
   public function __get($key)
   {
     $getter = 'get' . ucFirst($key);
     return method_exists($this, $getter)
       ? $this->$getter()
-      : $this->attributes[$key] ?? $this->attributes['__' . $key] ?? null;
+      : $this->attributes[$key] ?? null;
   }
 }

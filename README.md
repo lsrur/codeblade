@@ -1,13 +1,14 @@
+# BETA 
+
 # A handy and powerful code generator for Laravel
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/lsrur/codeblade.svg?style=flat-square)](https://packagist.org/packages/lsrur/codeblade)
-[![Total Downloads](https://img.shields.io/packagist/dt/lsrur/codeblade.svg?style=flat-square)](https://packagist.org/packages/lsrur/codeblade)
+As programmers we always find ourselves with the tedious need to write repetitive code for different models or tables of our application. As a code generator, Codeblade will free you from that boredom and will bring you two great features over other similar tools. 
 
-As programmers we always find ourselves with the tedious need to write repetitive code for different models or tables of our application. As a code generator, Codeblade will free you from that boredom and will bring you two great features over other tools.
+- Codeblade does not require you to write and maintain definition files (json, yaml or any other metadata file), instead it reverse-engineers your database on the fly and exposes a data dictionary to your templates for code generation. Handy.
 
-- Codeblade does not require you to write or maintain definition files (json, yaml or other metadata file), instead it reverse-engineers your database on the fly and exposes a data dictionary to your templates for code generation. 
+- Codeblade let you write your own templates in pure Blade! Yes, Laravel Blade generating Laravel code such as models, controllers, views, seeders, factories, form requests... but also Vue, React, Livewire or any source code you need, just write the template with the Blade syntax you already know. Powerful.
 
-- You write your own templates in pure Blade! Yes, Laravel Blade generating Laravel code such as models, controllers, views, seeders, form requests... but also Vue, React, Livewire or any source code you need, just write the template with the Blade syntax you already know.
+
 
 ## Table of Contents
 1. [Requirements](#requirements)
@@ -45,7 +46,7 @@ composer require lsrur/codeblade
 Publish the configuration file:
 
 ```bash
-composer require lsrur/codeblade
+php artisan vendor publish
 ```
 
 Prepare the templates folder in your project and copy the examples:
@@ -71,16 +72,44 @@ php artisan codeblade:make <template> <table1,table2> --force --copy
 
 | Param|Description |
 |-----|----|
-|template|Template file in dot notation (samples.controller), it should exist in one of your template folders defined in the configuration file |
+|template|Template file in dot notation (samples.controller), it should exist in one of your template folders/subfolders defined in the configuration |
 | table1,table2 | One or multiple table names (separated by commas) to be parsed and passed to the generator |
+|--params=|Parameters to be passed to the template (see below)|
 |--copy| Copy output code to the clipboard instead of writing files|
 |--force|Oerwrite output files without asking|
 
 
+### Template parameters 
+Codeblade allows you to specify one or multiple (comma separated with no spaces) parameters that will be passed to the template:
+
+```
+php artisan codeblade:make mytemplate mytable --params=flag,foo=bar
+```
+
+Those parameters will be usable from the template as follows:
+
+```
+@if($params->flag)
+  flag is ON
+@endif
+
+@if(! $params->noexist)
+  noexist is OFF
+@endif
+
+{{$params->foo}}
+// Result 'bar'
+
+@foreach($params->all as $key=>$value)
+  {{$key}}
+@endforeach
+// Result flag foo
+
+```
 
 
 ## <a name="writing"></a>Writing templates
-Every time you execute a "make" command, Codeblade reverse-engineers the tables involved, creating a data dictionary which passes to the code generation template in the form of an object with the following properties:
+Every time you execute a "make" command, Codeblade reverse-engineers the tables involved, creating a data dictionary which passes to the code generation template in the form of a Table object with the following properties:
 
 ### <a name="table_object"></a>Table Class
 
@@ -90,8 +119,8 @@ Every time you execute a "make" command, Codeblade reverse-engineers the tables 
 |name     |Name of the table |
 |singular|The name of the table in the singular|
 |modelName|Inferred model name based on Laravel naming conventions (contacts > Contact)|
-|fields| Array of fields |
-|relations| Array of relations  |
+|fields| Array of Field objects |
+|relations| Array of Relation objects  |
 
 ### <a name="field_object"></a> Field Class
 
@@ -99,7 +128,8 @@ Every time you execute a "make" command, Codeblade reverse-engineers the tables 
 |-----|----|
 |name|Name of the field|
 |label|Inferred label based on field's name (company_name -> Company Name)|
-|var|Inferred var name (company_name -> &#36;companyName)|
+|camel|Name in camelCase|
+|studly |Name in StudlyCase|
 |primary|The field is primary key (boolean)  |
 |autoincrement|The field is autoincrement (boolean)|
 |index| The field has an index (boolean)|
@@ -141,15 +171,15 @@ Codeblade will parse the "comment" metadata of each field looking for custom pro
 ...
 Schema::create('contacts', function (Blueprint $table) {
   $table->string("company_name")
-     ->comment("faker=company(),encrypt,foo=bar");
+     ->comment("faker=company(),flag,foo=bar");
 
 ```
 Then those properties will be available in your templates as direct properties of each field.
 
 ```
 @foreach($tabe->fields as $field)
-  @if($field->encrypt)
-    // 'encrypt' will be true for company_name
+  @if($field->flag)
+    // 'flag' will be true for company_name
   @endif
 
   {{$field->var}} = faker()->{{$field->faker}};
@@ -218,18 +248,19 @@ return view('{{$table->singular}}.index', compact(${{$table->name}}));
 ...
 ```
 
-#### Use of params
+#### Using parameters
 
 ```
 php artisan codeblade:make mytemplate mytable --params=api,css=tailwind
 ```
 
 ```
-@if($api'])
-	doThis()
+@if($params['api'])
+ //
 @endif
 
-@if($parms['css'] == 'tailwind')
+@if($params['css'] == 'tailwind')
+  // 
 @endif
 
 ...

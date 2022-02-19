@@ -71,6 +71,6 @@ class DictTable
     $getter = 'get' . ucFirst($key);
     return method_exists($this, $getter)
       ? $this->$getter()
-      : $this->tableDict[$key] ?? $this->tableDict['__' . $key] ?? null;
+      : $this->tableDict[$key] ?? null;
   }
 }

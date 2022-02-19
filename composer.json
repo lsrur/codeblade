@@ -1,8 +1,9 @@
 {
   "name": "lsrur/codeblade",
-  "description": "Laravel Code Generation Tool",
+  "description": "A handy and powerful code generator for Laravel",
   "keywords": [
-    "lsrur",
+    "laravel",
+    "code generator",
     "codeblade"
   ],
   "homepage": "https://github.com/lsrur/codeblade",
