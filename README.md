@@ -35,19 +35,19 @@ As programmers we always face the tedious need to write repetitive code for diff
 
 You can install the package via composer:
 
-```bash
+```
 composer require lsrur/codeblade
 ```
 
 Publish the configuration file (it will be useful):
 
-```bash
+```
 php artisan vendor:publish --provider="Lsrur\Codeblade\CodebladeServiceProvider"
 ```
 
 Prepare the templates folder in your project and copy the examples:
 
-```bash
+```
 php artisan codeblade:install
 ```
 
@@ -84,7 +84,7 @@ php artisan codeblade:make mytemplate mytable --params=flag,foo=bar
 
 Those parameters will be usable from the template as follows:
 
-```
+```php
 @if($params->flag)
   flag is ON
 @endif
@@ -146,7 +146,7 @@ Every time you execute a "make" command, Codeblade reverse-engineers the tables 
 #### <a name="base_types"></a>Base types
 Base types are useful for grouping fields of similar -but not the same- data types.
 
-```
+```php
 @foreach($Table->fields as $field)
   @includeIf($field->base_type == 'string', 'partials.forms.textinput');
   @includeIf($field->base_type == 'integer', 'partials.forms.integerinput');
@@ -172,7 +172,7 @@ Base types are useful for grouping fields of similar -but not the same- data typ
 #### <a name="custom_props"></a>Custom properties 
 Codeblade will parse the "comment" metadata of each field looking for custom properties. You can add these properties in the field definition during migration in the following way:
 
-```
+```php
 ...
 Schema::create('contacts', function (Blueprint $table) {
   $table->string("company_name")
@@ -182,7 +182,7 @@ Schema::create('contacts', function (Blueprint $table) {
 
 Then those properties will be available in your templates as direct properties of each field.
 
-```
+```php
 @foreach($tabe->fields as $field)
   @if($field->flag)
     // 'flag' will be true for company_name
