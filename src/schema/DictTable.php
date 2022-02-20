@@ -5,15 +5,17 @@ namespace Lsrur\Codeblade\Schema;
 class DictTable
 {
   private $tableName;
+  public $timestamps;
   private $fields;
   private $relations;
 
   public function __construct(string $tableName)
   {
     $this->tableName = $tableName;
+    $fieldSet = TableSchema::getFields($tableName);
+    $this->timestamps = $fieldSet->whereIn('name', ['created_at', 'updated_at'])->count() == 2;
 
-    $this->fields = TableSchema::getFields($tableName)
-      ->whereNotIn('name', ['created_at', 'updated_at', 'deleted_at'])
+    $this->fields = $fieldSet->whereNotIn('name', ['created_at', 'updated_at', 'deleted_at'])
       ->map(function ($field) {
         return new DictField($field);
       });
@@ -26,7 +28,19 @@ class DictTable
 
   public function getName()
   {
-    return $this->tableName;
+    return \Str::of($this->tableName);
+  }
+
+  public function getPrimaryKey()
+  {
+    return collect($this->fields)
+      ->filter(function ($f) {
+        return $f->is_primary;
+      })
+      ->map(function ($f) {
+        return $f->name->value;
+      })
+      ->implode(',');
   }
 
   public function getFields()
@@ -41,29 +55,9 @@ class DictTable
 
   public function getFieldNames()
   {
-    return collect($this->fields)->map(function ($f) {
-      return $f->name;
+    return $this->fields->map(function ($f) {
+      return $f->name->value();
     });
-  }
-
-  public function getSingular()
-  {
-    return \Str::singular($this->tableName);
-  }
-
-  public function getModelName()
-  {
-    return \Str::of($this->tableName)
-      ->singular()
-      ->studly()
-      ->value();
-  }
-
-  public function getTimestamps()
-  {
-    return collect($this->getFieldNames())
-      ->intersect(['updated_at', 'created_at'])
-      ->count() == 2;
   }
 
   public function __get($key)

@@ -4,10 +4,9 @@
 
 As programmers we always face the tedious need to write repetitive code for different models or tables of our application. As a code generator, Codeblade will free you from that boredom and will bring you two great features over other similar tools. 
 
-- Codeblade does not require you to write and maintain definition files (json, yaml or any other metadata file), instead it reverse-engineers your database on the fly and exposes a data dictionary to your templates for code generation. Handy.
+- Codeblade does not require you to write and maintain definition files (json, yaml or any other metadata file), instead it reverse-engineers your database on the fly and exposes a data dictionary to your templates for code generation.
 
-- Codeblade let you write your own templates in pure Blade! Yes, Laravel Blade generating Laravel code such as models, controllers, views, seeders, factories, form requests... but also Vue, React, Livewire or any source code you need, just write the template with the Blade syntax you already know. Powerful.
-
+- Codeblade let you write your own templates in pure Blade! Yes, the power of Laravel Blade generating Laravel components such as models, controllers, views, seeders, factories, form requests... but also Vue, React, Livewire, html or any source code you need, just write the template with the Blade syntax you already know.
 
 
 ## Table of Contents
@@ -24,9 +23,6 @@ As programmers we always face the tedious need to write repetitive code for diff
 6. [Contributing](#contrib)
 7. [Security](#security)
 7. [License](#license)
-
-
-
 
 
 ## <a name="requirements"></a>Requirements 
@@ -138,20 +134,22 @@ Every time you execute a "make" command, Codeblade reverse-engineers the tables 
 |scale|Decimal digits|
 |enum_options| Array of options if field type is enum or set|
 |is_foreign| Field is foreign|
-|references| Referenced table|
+|references| Referenced table as Stringable [(see stringables)](#stringables)|
 |on| Referenced key on foreign table|
-|rule|Inferred validation rule based on field properties (type, size, slcale, nullable, etc.)|
-|cast|Cast type (Ex: json->array)|
-|custom_property| See custom properties below| 
+|rule|Inferred validation rule based on field properties (type, size, foreign, nullable, etc.) \*|
+|faker|Inferred faker method ased on field type and foreign properties \*|
+|cast|Cast type (Ex: json->array) \*|
+|custom_property| [see custom properties below](#custom_props)| 
 
+\* These properties can be overridden by custom_properties 
 
 #### <a name="base_types"></a>Base types
-base types are useful for grouping similar data types together and then using those groups in your templates instead of type by type:
+Base types are useful for grouping fields of similar -but not the same- data types.
 
 ```
 @foreach($Table->fields as $field)
-	@includeIf($field->base_type == 'string', 'partials.forms.textinput');
-	@includeIf($field->base_type == 'integer', 'partials.forms.integerinput');
+  @includeIf($field->base_type == 'string', 'partials.forms.textinput');
+  @includeIf($field->base_type == 'integer', 'partials.forms.integerinput');
 @endforeach
 ```
 
@@ -171,7 +169,7 @@ base types are useful for grouping similar data types together and then using th
 |json, jsonb | json|
 
  
-#### Custom properties 
+#### <a name="custom_props"></a>Custom properties 
 Codeblade will parse the "comment" metadata of each field looking for custom properties. You can add these properties in the field definition during migration in the following way:
 
 ```
@@ -214,9 +212,9 @@ Then those properties will be available in your templates as direct properties o
 
 
 #### <a name="stringables"></a>Stringables
-The "name" property of Table and Field classes are returned as Stringable instances, so you can use them as-is or chain \Str methods:
+Properties returned as Stringable instances can be used as-is or by chaining \Str methods:
 
-```
+```php
 {{$Table->name}}
 // contacts
 
@@ -225,7 +223,7 @@ The "name" property of Table and Field classes are returned as Stringable instan
 
 @foreach($Table->fields as $field)
   {{$field->name->camel()->prepend('$')}} = $request->{{$field->name}};
-  // ... $companyName = $request->company_name;
+  // $companyName = $request->company_name;
 @endforeach
 
 ```
@@ -244,9 +242,9 @@ It doesn't matter if you use slashes or backslashes, Codeblade will adjust the o
 ```
 
 ##### @cbRun() 
-Tells Codeblade to execute another template.
+Tells Codeblade to execute another template, same tables and parameters will be applied.
 
-```
+```php
 {{-- This is a CRUD template --}}
 @cbRun('model')
 @cbRun('controller')
@@ -257,43 +255,9 @@ Tells Codeblade to execute another template.
 ```
 
 ### <a name="samples"></a>Example Templates
-#### Basic
 
-```
-namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
-use App\Models\{{$table->modelName}};
-
-class {{$table->modelName}}Controller extends Controller
-{
-
-public function index()
-{
-${{$table->name}} = {{$table->modelName}}::all();
-
-return view('{{$table->singular}}.index', compact(${{$table->name}}));
-}
-...
-```
-
-#### Using parameters
-
-```
-php artisan codeblade:make mytemplate mytable --params=api,css=tailwind
-```
-
-```
-@if($params['api'])
- //
-@endif
-
-@if($params['css'] == 'tailwind')
-  // 
-@endif
-
-...
-```
+Take a look at the [samples](https://github.com/lsrur/codeblade/tree/master/samples) folder of this repo.
+In order not to interfere with your project, the template examples provided generate code in the base_path('generatedcode') folder. Change the cbSaveAs line to output it to the appropriate project folders.
 
 
 ## <a name="contrib"></a>Contributing

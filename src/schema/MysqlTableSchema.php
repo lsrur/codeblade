@@ -53,7 +53,7 @@ class MysqlTableSchema implements TableSchemaInterface
 
   private function getEnumOptions($field)
   {
-    return $field->DATA_TYPE == 'enum'
+    return $field->DATA_TYPE == 'enum' || $field->DATA_TYPE == 'set'
       ? \Str::of($field->COLUMN_TYPE)
           ->between('(', ')')
           ->remove("'")
@@ -83,11 +83,11 @@ class MysqlTableSchema implements TableSchemaInterface
       return array_merge($meta, [
         'name' => $item->COLUMN_NAME,
         'position' => $item->ORDINAL_POSITION,
-        'primary' => $item->COLUMN_KEY == 'PRI',
-        'autoincrement' => $item->EXTRA == 'auto_increment',
-        'index' => $item->COLUMN_KEY == 'MUL',
+        'is_primary' => $item->COLUMN_KEY == 'PRI',
+        'is_autoincrement' => $item->EXTRA == 'auto_increment',
+        'is_index' => $item->COLUMN_KEY == 'MUL',
         'default' => $item->COLUMN_DEFAULT,
-        'nullable' => $item->IS_NULLABLE == 'YES',
+        'is_nullable' => $item->IS_NULLABLE == 'YES',
         'type' => $item->DATA_TYPE,
         'size' => $item->CHARACTER_MAXIMUM_LENGTH ?? $item->NUMERIC_PRECISION,
         'scale' => $item->NUMERIC_SCALE,
