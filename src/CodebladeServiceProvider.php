@@ -56,21 +56,6 @@ class CodebladeServiceProvider extends ServiceProvider
         __DIR__ . '/../config/config.php' => config_path('codeblade.php'),
       ], 'config');
 
-      // Publishing the views.
-      /*$this->publishes([
-          __DIR__.'/../resources/views' => resource_path('views/vendor/codeblade'),
-      ], 'views');*/
-
-      // Publishing assets.
-      /*$this->publishes([
-          __DIR__.'/../resources/assets' => public_path('vendor/codeblade'),
-      ], 'assets');*/
-
-      // Publishing the translation files.
-      /*$this->publishes([
-          __DIR__.'/../resources/lang' => resource_path('lang/vendor/codeblade'),
-      ], 'lang');*/
-
       // Registering package commands.
       $this->commands([
         MakeCommand::class,
@@ -84,12 +69,6 @@ class CodebladeServiceProvider extends ServiceProvider
    */
   public function register()
   {
-    // Automatically apply the package configuration
     $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'codeblade');
-
-    // Register the main class to use with the facade
-    // $this->app->singleton('codeblade', function () {
-    //   return new Codeblade;
-    // });
   }
 }

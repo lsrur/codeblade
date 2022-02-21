@@ -66,7 +66,7 @@ class MakeCommand extends Command
       config('codeblade.pbcopy_command', 'pbcopy < {file}')
     );
 
-    // Exec command and get termination
+    // Exec command and get termination code
     $res = null;
     $out = [];
     exec($cmd, $out, $res);
