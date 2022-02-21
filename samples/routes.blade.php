@@ -1,4 +1,5 @@
 // use App\Http\Controllers\{{$table->model}}Controller;
+
 Route::controller({{$table->model}}Controller::class)->group(function () {
   Route::get('/{{$table->name}}', 'index');
   Route::get('/{{$table->name}}/create', 'create');

@@ -1,6 +1,7 @@
 @php($name=$table->name->singular()->studly())
-{{-- @cbSaveAs(base_path('generatedcode/database/factories/'.$name.'Factory.php')) --}}
 @cbSaveAs(base_path('database/factories/'.$name.'Factory.php'))
+{{-- @cbSaveAs(base_path('generatedcode/database/factories/'.$name.'Factory.php')) --}}
+
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;

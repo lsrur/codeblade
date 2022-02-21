@@ -1,5 +1,6 @@
 @cbSaveAs(base_path("generatedcode/resources/views/".$table->name.'_index.blade.php'))
 {{-- @cbSaveAs(base_path("resources/views/".$table->name.'_edit.blade.php')) --}}
+
 <h1>Editing {{$table->name->singular()->title()}}</h1>
 <form method="POST" action="/{{$table->name}}/@cbCurly(${{$table->name->singular()}}->id)">
   @@csrf

@@ -2,8 +2,8 @@
   $controllerName = $table->model.'Controller';
 @endphp
 
-{{-- @cbSaveAs(base_path('generatedcode/Http/Controllers/'.$controllerName.'.php')) --}}
 @cbSaveAs(app_path('Http/Controllers/'.$controllerName.'.php'))
+{{-- @cbSaveAs(base_path('generatedcode/Http/Controllers/'.$controllerName.'.php')) --}}
 
 namespace App\Http\Controllers;
 
