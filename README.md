@@ -1,4 +1,4 @@
-# BETA 
+
 
 # A handy and powerful code generator for Laravel
 
@@ -8,6 +8,8 @@ As programmers we always face the tedious need to write repetitive code for diff
 
 - CodeBlade let you write your own templates in pure Blade! Yes, the power of Laravel Blade generating Laravel components such as models, controllers, views, seeders, factories, form requests... but also Vue, React, Livewire, html or any source code you need, just write the template with the Blade syntax you already know.
 
+
+> Code Blade is at an early stage, please tell me about your experience installing and getting started with it.
 
 ## Table of Contents
 1. [Requirements](#requirements)
@@ -275,6 +277,8 @@ Wraps the output in curly braces, useful when generating Blade or Vue views.
 
 Take a look at the [samples](https://github.com/lsrur/CodeBlade/tree/master/samples) folder of this repo.
 In order not to interfere with your project, the template examples provided generate code in `yourprojectroot/generatedcode` folder. Change the cbSaveAs line in the templates to write in the appropriate project folders.
+
+The examples are provided to guide you in developing your own templates, they are not admin panel builders or anything like that.
 
 
 ## <a name="contrib"></a>Contributing
