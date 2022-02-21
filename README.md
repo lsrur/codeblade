@@ -44,7 +44,7 @@ composer require lsrur/CodeBlade
 Publish the configuration file (it will be useful):
 
 ```
-php artisan vendor:publish --provider="Lsrur\CodeBlade\CodeBladeServiceProvider"
+php artisan vendor:publish --provider="Lsrur\Codeblade\CodebladeServiceProvider"
 ```
 
 Prepare the templates folder in your project and copy the examples:
