@@ -11,7 +11,7 @@ class MakeCommand extends Command
 {
   protected $signature = 'codeblade:make
     {template : Template name in dot notation (samples.model)}
-    {table : Table name (multiple tables separated by comma w/o spaces or * for all tables) }
+    {table : Table name (multiple tables separated by comma w/o spaces) }
     {--params= : Parameters to be passed to the template }
     {--copy : Copy to clipboard insted writing files}
     {--force : Force overwrite}';
@@ -48,24 +48,6 @@ class MakeCommand extends Command
     }
 
     return file_get_contents($templateFile);
-  }
-
-  /**
-   * ParseParams
-   * Parse params option (--params) as key=>value or $key=true
-   */
-  private function parseParams()
-  {
-    // \Config::set(
-    //   'cb_params',
-    //   collect(explode(',', $this->option('params') ?? ''))
-    //     ->mapWithKeys(function ($v) {
-    //       return [
-    //         \Str::before($v, '=') => (\Str::contains($v, '=') ? \Str::after($v, '=') : true)
-    //       ];
-    //     })
-    //     ->toArray()
-    // );
   }
 
   /**
@@ -146,12 +128,16 @@ class MakeCommand extends Command
     // Let's code!
     $result = Blade::render($blade, [
       'table' => $tableDict,
-      'params' => $this->params
+      'params' => $this->params,
+      '__startCurlyBraces' => '{{',
+      '__endCurlyBraces' => '}}'
     ], true);
 
+    $fileName = \Config::get('cb_save_as');
+
     // Result could be empty, ex when a template only calls other templates
-    if (!empty('result')) {
-      if ($this->option('copy')) {
+    if (!empty(trim($result))) {
+      if ($this->option('copy') || empty($fileName)) {
         $this->toClipboard .= $result . PHP_EOL;
       } else {
         $this->saveOutput($result);
@@ -169,7 +155,6 @@ class MakeCommand extends Command
   */
   public function handle()
   {
-    // $this->parseParams();
     $this->params = new MakeParams($this->option('params'));
     $this->toClipboard = '';
 

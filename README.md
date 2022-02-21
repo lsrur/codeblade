@@ -2,11 +2,11 @@
 
 # A handy and powerful code generator for Laravel
 
-As programmers we always face the tedious need to write repetitive code for different models or tables of our application. As a code generator, Codeblade will free you from that boredom and will bring you two great features over other similar tools. 
+As programmers we always face the tedious need to write repetitive code for different models or tables of our application. As a code generator, CodeBlade will relieve you of that boredom but with two big differences from other similar tools:
 
-- Codeblade does not require you to write and maintain definition files (json, yaml or any other metadata file), instead it reverse-engineers your database on the fly and exposes a data dictionary to your templates for code generation.
+- CodeBlade does not require you to write and maintain definition files (json, yaml or any other metadata file), instead it reverse-engineers your database on the fly and exposes a data dictionary to your templates for code generation.
 
-- Codeblade let you write your own templates in pure Blade! Yes, the power of Laravel Blade generating Laravel components such as models, controllers, views, seeders, factories, form requests... but also Vue, React, Livewire, html or any source code you need, just write the template with the Blade syntax you already know.
+- CodeBlade let you write your own templates in pure Blade! Yes, the power of Laravel Blade generating Laravel components such as models, controllers, views, seeders, factories, form requests... but also Vue, React, Livewire, html or any source code you need, just write the template with the Blade syntax you already know.
 
 
 ## Table of Contents
@@ -15,9 +15,9 @@ As programmers we always face the tedious need to write repetitive code for diff
 3. [Configuration](#config)
 4. [Code generation](#codegen)
 5. [Writing templates](#writing)
-	1. [Table Class](#table_object)
-	2. [Field Class](#field_object)
-	3. [Relation Class](#relation_object)
+	1. [Table Properties](#table_object)
+	2. [Field Properties](#field_object)
+	3. [Relation Properties](#relation_object)
 	4. [Directives](#directives)
 	5. [Examples](#samples)
 6. [Contributing](#contrib)
@@ -27,33 +27,33 @@ As programmers we always face the tedious need to write repetitive code for diff
 
 ## <a name="requirements"></a>Requirements 
 
-- Laravel 9.x (Codeblade uses a new feature in Laravel 9 for inline compilation of Blade templates, it won't work with earlier versions). 
+- Laravel 9+ (CodeBlade uses a new feature in Laravel 9 for inline compilation of Blade templates). 
 
-- MySQL (For now, Codeblade only works with MySQL/MariaDB connections. Reverse engineering for pgsql is on the way).
+- MySQL (For now, CodeBlade only works with MySQL/MariaDB connections. Reverse engineering for pgsql is on the way).
 
 ## <a name="instalation"></a>Installation
 
 You can install the package via composer:
 
 ```
-composer require lsrur/codeblade
+composer require lsrur/CodeBlade
 ```
 
 Publish the configuration file (it will be useful):
 
 ```
-php artisan vendor:publish --provider="Lsrur\Codeblade\CodebladeServiceProvider"
+php artisan vendor:publish --provider="Lsrur\CodeBlade\CodeBladeServiceProvider"
 ```
 
 Prepare the templates folder in your project and copy the examples:
 
 ```
-php artisan codeblade:install
+php artisan CodeBlade:install
 ```
 
 
 ## <a name="config"></a>Configuration
-There are two configuration keys in config/codeblade.php:
+There are two configuration keys in config/CodeBlade.php:
 
 | Key|Description |
 |-----|----|
@@ -63,7 +63,7 @@ There are two configuration keys in config/codeblade.php:
 ## <a name="codegen"></a>Code generation
 
 ```
-php artisan codeblade:make <template> <table1,table2> --force --copy
+php artisan CodeBlade:make <template> <table1,table2> --params= --force --copy
 ```
 
 | Param|Description |
@@ -76,10 +76,10 @@ php artisan codeblade:make <template> <table1,table2> --force --copy
 
 
 ### Template parameters 
-Codeblade allows you to specify one or multiple (comma separated with no spaces) parameters that will be passed to the template:
+CodeBlade allows you to specify one or multiple (comma separated with no spaces) parameters that will be passed to the template:
 
 ```
-php artisan codeblade:make mytemplate mytable --params=flag,foo=bar
+php artisan CodeBlade:make mytemplate mytable --params=flag,foo=bar
 ```
 
 Those parameters will be usable from the template as follows:
@@ -105,20 +105,28 @@ Those parameters will be usable from the template as follows:
 
 
 ## <a name="writing"></a>Writing templates
-Every time you execute a "make" command, Codeblade reverse-engineers the tables involved, creating a data dictionary which passes to the code generation template in the form of a Table object with the following properties:
+Every time we execute a "make" command, CodeBlade reverse-engineers the tables involved, creating a data dictionary which passes to the code generation template in the form of a Table object. Then we write our templates as follows:
 
-### <a name="table_object"></a>Table Class
+```php
+@forarch($table->fields as $field)
+  @if(! $field->is_autoincrement)
+    {{$field->camel()->prepend('$')}} = $request->{{$field->name}};
+  @endif
+@endforeach
+```
+
+### <a name="table_object"></a>Table Properties
 
 
 | Property| Description|
 |-----|----|
 |name     |Name of the table as Stringable instance [(see stringables)](#stringables) |
-|singular|The name of the table in the singular|
-|modelName|Inferred model name based on Laravel naming conventions (contacts > Contact)|
+|model|Inferred model name based on Laravel naming conventions|
 |fields| Array of Field objects |
+|primary| Array of primary keys as Field objects |
 |relations| Array of Relation objects  |
 
-### <a name="field_object"></a> Field Class
+### <a name="field_object"></a> Field Properties
 
 | Property | Description |
 |-----|----|
@@ -170,7 +178,7 @@ Base types are useful for grouping fields of similar -but not the same- data typ
 
  
 #### <a name="custom_props"></a>Custom properties 
-Codeblade will parse the "comment" metadata of each field looking for custom properties. You can add these properties in the field definition during migration in the following way:
+CodeBlade will parse the "comment" metadata of each field looking for custom properties. You can add these properties in the field definition during migration in the following way:
 
 ```php
 ...
@@ -199,7 +207,7 @@ Then those properties will be available in your templates as direct properties o
 
 ```
 
-### <a name="field_object"></a>Relation Class
+### <a name="relation_object"></a>Relation Properties
 
 |Property |Description |
 |-----|----|
@@ -231,18 +239,16 @@ Properties returned as Stringable instances can be used as-is or by chaining \St
 ### <a name="directives"></a>Blade Directives
 
 ##### @cbSaveAs() 
-Tells Codeblade where to write the generated code. Every template must have a `@cbSaveAs` directive unless it will always be used with the --copy option (copy to the clipboard) or always called as part of another template with `@include`. 
-It doesn't matter if you use slashes or backslashes, Codeblade will adjust the output to your OS.
-
+Tells CodeBlade where to write the generated code. If a template does not specify this directive, the resulting code will be copied to the clipboard.
 
 ```
-@cbSaveAs(app_path('Http/Controllers/'.$table->modelName.'Controller.php'))
-// for table "contacts", the file will be written in app/Http/Controllers/ContactControllar.php
+@cbSaveAs(app_path('Http/Controllers/'.$table->model.'Controller.php'))
+// for table "contacts", the file will be written in app/Http/Controllers/ContactController.php
 
 ```
 
 ##### @cbRun() 
-Tells Codeblade to execute another template, same tables and parameters will be applied.
+Tells CodeBlade to execute another template, same tables and parameters will be applied.
 
 ```php
 {{-- This is a CRUD template --}}
@@ -254,10 +260,21 @@ Tells Codeblade to execute another template, same tables and parameters will be 
 
 ```
 
+##### @cbCurly() 
+Wraps the output in curly braces, useful when generating Blade or Vue views. 
+
+```php
+@cbCurly({{$table->name->singular()->prepend('$')}}->{{$field->name}})
+=> {{$contact->company_name}}
+
+<div>@cbCurly({{$table->name->singular()}}.{{$field->name}})</div>
+=> <div>{{contact.company_name}}</div>
+```
+
 ### <a name="samples"></a>Example Templates
 
-Take a look at the [samples](https://github.com/lsrur/codeblade/tree/master/samples) folder of this repo.
-In order not to interfere with your project, the template examples provided generate code in the base_path('generatedcode') folder. Change the cbSaveAs line to output it to the appropriate project folders.
+Take a look at the [samples](https://github.com/lsrur/CodeBlade/tree/master/samples) folder of this repo.
+In order not to interfere with your project, the template examples provided generate code in `yourprojectroot/generatedcode` folder. Change the cbSaveAs line in the templates to write in the appropriate project folders.
 
 
 ## <a name="contrib"></a>Contributing

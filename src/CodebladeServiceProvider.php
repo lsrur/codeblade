@@ -15,6 +15,14 @@ class CodebladeServiceProvider extends ServiceProvider
    */
   public function boot()
   {
+    Blade::directive('start', function ($expression) {
+      return '{{$s}}';
+    });
+
+    Blade::directive('cbCurly', function ($expression) {
+      return '{{$__startCurlyBraces}}' . $expression . '{{$__endCurlyBraces}}';
+    });
+
     Blade::directive('cbSaveAs', function ($expression) {
       $expression = \Str::of($expression)
         ->replace('/', DIRECTORY_SEPARATOR)

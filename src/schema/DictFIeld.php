@@ -80,7 +80,7 @@ class DictField
     : '';
 
     return $this->attributes['rule'] ?? implode('|', array_filter([
-      $this->nullable ? 'nullable' : 'required',
+      $this->is_nullable ? 'nullable' : 'required',
       $baseTypeRule[$this->base_type],
       $foreign
     ]));

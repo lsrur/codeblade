@@ -31,16 +31,22 @@ class DictTable
     return \Str::of($this->tableName);
   }
 
-  public function getPrimaryKey()
+  public function getModel()
+  {
+    return \Str::of($this->tableName)
+      ->singular()
+      ->title()
+      ->studly()
+      ->value();
+  }
+
+  public function getPrimary()
   {
     return collect($this->fields)
       ->filter(function ($f) {
         return $f->is_primary;
       })
-      ->map(function ($f) {
-        return $f->name->value;
-      })
-      ->implode(',');
+      ->toArray();
   }
 
   public function getFields()
@@ -63,8 +69,6 @@ class DictTable
   public function __get($key)
   {
     $getter = 'get' . ucFirst($key);
-    return method_exists($this, $getter)
-      ? $this->$getter()
-      : $this->tableDict[$key] ?? null;
+    return method_exists($this, $getter) ? $this->$getter() : null;
   }
 }
