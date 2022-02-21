@@ -211,12 +211,12 @@ Then those properties will be available in your templates as direct properties o
 
 |Property |Description |
 |-----|----|
-|local_key| |
+|local_key| Local referenced field name |
 |type|'belongs_to_many' or 'has_many' |
 |pivot|Pivot table name for 'belongs_to_many'|
 |model|Related model name based on Laravel naming conventions |
-|foreign_key | Related foreign key| 
-|foreign_table | Related foreign table| 
+|foreign_key | Related foreign key for 'has_many'| 
+|foreign_table | Related foreign table for 'has_many'| 
 
 
 #### <a name="stringables"></a>Stringables

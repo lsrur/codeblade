@@ -147,7 +147,7 @@ class MysqlTableSchema implements TableSchemaInterface
       ];
       if ($this->isManyToMany($relation)) {
         $rel['type'] = 'belongs_to_many';
-        $rel['pivot'] = $this->getPivotFields($relation);
+        $rel['pivot'] = $relation->TABLE_NAME;
         $rel['model'] = \Str::of($relation->TABLE_NAME)
           ->replace(\Str::singular($this->tableName), '')
           ->singular()->studly()->value();

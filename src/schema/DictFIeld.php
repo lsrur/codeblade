@@ -33,7 +33,9 @@ class DictField
       'time' => 'time'
     ];
 
-    return $baseTypeCast[$this->base_type] ?? null;
+    return $this->attributes['cast']
+      ?? $baseTypeCast[$this->base_type]
+      ?? null;
   }
 
   public function getFaker()
@@ -76,8 +78,8 @@ class DictField
     ];
 
     $foreign = $this->is_foreign
-    ? 'exists:' . $this->references . ',' . $this->on
-    : '';
+      ? 'exists:' . $this->references . ',' . $this->on
+      : '';
 
     return $this->attributes['rule'] ?? implode('|', array_filter([
       $this->is_nullable ? 'nullable' : 'required',
