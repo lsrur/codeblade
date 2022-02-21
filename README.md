@@ -48,7 +48,7 @@ php artisan vendor:publish --provider="Lsrur\CodeBlade\CodeBladeServiceProvider"
 Prepare the templates folder in your project and copy the examples:
 
 ```
-php artisan CodeBlade:install
+php artisan codeblade:install
 ```
 
 
@@ -63,7 +63,7 @@ There are two configuration keys in config/CodeBlade.php:
 ## <a name="codegen"></a>Code generation
 
 ```
-php artisan CodeBlade:make <template> <table1,table2> --params= --force --copy
+php artisan codeblade:make <template> <table1,table2> --params= --force --copy
 ```
 
 | Param|Description |
@@ -79,7 +79,7 @@ php artisan CodeBlade:make <template> <table1,table2> --params= --force --copy
 CodeBlade allows you to specify one or multiple (comma separated with no spaces) parameters that will be passed to the template:
 
 ```
-php artisan CodeBlade:make mytemplate mytable --params=flag,foo=bar
+php artisan codeblade:make mytemplate mytable --params=flag,foo=bar
 ```
 
 Those parameters will be usable from the template as follows:
