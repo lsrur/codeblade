@@ -9,13 +9,13 @@ use Illuminate\Support\Facades\Facade;
  */
 class CodebladeFacade extends Facade
 {
-    /**
-     * Get the registered name of the component.
-     *
-     * @return string
-     */
-    protected static function getFacadeAccessor()
-    {
-        return 'codeblade';
-    }
+  /**
+   * Get the registered name of the component.
+   *
+   * @return string
+   */
+  protected static function getFacadeAccessor()
+  {
+    return 'codeblade';
+  }
 }
