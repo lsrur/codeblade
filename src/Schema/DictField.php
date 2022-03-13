@@ -6,6 +6,7 @@ class DictField
 {
   private $attributes;
 
+  
   public function __construct($attributes)
   {
     $this->attributes = $attributes;
