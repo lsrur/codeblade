@@ -9,6 +9,7 @@ class DictRelation
   public function __construct($attr)
   {
     $this->attributes = $attr;
+    
   }
 
   public function __get($key)

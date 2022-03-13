@@ -29,6 +29,7 @@ class DictTable
   public function getName()
   {
     return \Str::of($this->tableName);
+    
   }
 
   public function getModel()
